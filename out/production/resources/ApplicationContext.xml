@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        <bean id="mp3Player" class="interfaces.impl.Mp3Player">
+            <constructor-arg ref="mp3PlayerForm"/></bean>
+        <bean id="playlist" class="interfaces.impl.Mp3PlayList">
+            <constructor-arg index="0" ref="mp3Player"/>
+            <constructor-arg index="1" ref="songList"/>
+        </bean>
+        <bean id="songList" class="javax.swing.JList"/>
+        <bean id="mp3PlayerForm" class="Mp3PlayerForm"/>
+</beans>
