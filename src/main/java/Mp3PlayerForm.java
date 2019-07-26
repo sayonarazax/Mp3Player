@@ -4,10 +4,10 @@ import interfaces.PlayControlListener;
 import interfaces.PlayList;
 import interfaces.Player;
 import interfaces.impl.Mp3PlayList;
-import listeners.SearchListener;
 import interfaces.impl.Mp3Player;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import listeners.SearchListener;
+
+
 import utils.ExtensionFileFilter;
 import utils.FileUtils;
 
@@ -16,7 +16,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 
 import static interfaces.impl.Mp3PlayList.PLAYLIST_FILE_DESCRIPTION;
@@ -70,8 +73,6 @@ public class Mp3PlayerForm extends JFrame implements PlayControlListener {
     private JMenuBar menuBar = new JMenuBar();
     private JFileChooser fileChooser = new JFileChooser();
 
-    ApplicationContext context = new ClassPathXmlApplicationContext("ApplicationContext.xml");
-
     public JPanel rootPanel;
     private JTextField searchField;
     private JButton searchButton;
@@ -97,8 +98,6 @@ public class Mp3PlayerForm extends JFrame implements PlayControlListener {
     public Mp3PlayerForm() {
         super("Mp3Player");
         initComponents();
-  //      player = new Mp3Player(this);
- //       playList = new Mp3PlayList(player, songList);
     }
 
     public static void main(String[] args) {
@@ -111,9 +110,8 @@ public class Mp3PlayerForm extends JFrame implements PlayControlListener {
     }
 
     public void initComponents() {
-        context.getBean("mp3PlayerForm");
-        player = (Mp3Player) context.getBean("Mp3Player");
-        playList = (Mp3PlayList) context.getBean("Mp3PlayList");
+        player = new Mp3Player(this);
+        playList = new Mp3PlayList(player, songList);
         player.setVolume(slider1.getValue());
         slider1.setMaximum(Mp3Player.MAX_VOLUME);
 
@@ -186,11 +184,17 @@ public class Mp3PlayerForm extends JFrame implements PlayControlListener {
 
     public void addListeners() {
         searchField.addFocusListener(new SearchListener(searchField));
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playList.search(searchField.getText().trim());
+            }
+        });
         addBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                btnAddSongActionPerformed(e);
-            }
+                        btnAddSongActionPerformed(e);
+                    }
         });
         removeBtn.addActionListener(new ActionListener() {
             @Override
@@ -264,12 +268,7 @@ public class Mp3PlayerForm extends JFrame implements PlayControlListener {
                 muteButtonActionPerformed(e);
             }
         });
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonSearchActionPerformed(e);
-            }
-        });
+
         popAddSong.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -350,9 +349,6 @@ public class Mp3PlayerForm extends JFrame implements PlayControlListener {
         changeSkin(this, new HiFiLookAndFeel());
     }
 
-    public void buttonSearchActionPerformed(ActionEvent e) {
-
-    }
 
     public void btnAddSongActionPerformed(ActionEvent e) {
         FileUtils.addFileFilter(fileChooser, mp3FileFilter);
@@ -432,19 +428,6 @@ public class Mp3PlayerForm extends JFrame implements PlayControlListener {
         }
     }
 
-    public void slideProgressStateChanged(ChangeEvent e) {
-        if (slideProgress.getValueIsAdjusting() == true) {
-            if (moveAutomatic = true) {
-                moveAutomatic = false;
-                posValue = slideProgress.getValue() * 1.0 / 1000;
-                processSeek(posValue);
-            } else {
-                moveAutomatic = false;
-       ///         movingFromJump = true;
-            }
-        }
-    }
-
     private void slideProgressMouseReleased(MouseEvent e) {//GEN-FIRST:event_slideProgressMouseReleased
         if (slideProgress.getValueIsAdjusting() == false) {
             posValue = slideProgress.getValue() * 1.0 / 1000;
@@ -456,16 +439,6 @@ public class Mp3PlayerForm extends JFrame implements PlayControlListener {
 
     private void slideProgressMousePressed(MouseEvent e) {//GEN-FIRST:event_slideProgressMousePressed
         moveAutomatic = false;
-    }
-
-    public void processSeek(double bytes) {
-        try {
-            //           long skipBytes = (long) Math.round(((Integer) bytesLen).intValue() * bytes);
-            //          player.jump(skipBytes);
-        } catch (Exception e) {
-            e.printStackTrace();
-  //          movingFromJump = false;
-        }
     }
 
     public void nextButtonActionPerformed(ActionEvent e) {

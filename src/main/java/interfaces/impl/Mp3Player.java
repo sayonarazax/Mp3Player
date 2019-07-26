@@ -111,13 +111,13 @@ public class Mp3Player implements Player {
         }
 
     public double calcVolume(double currentVolume){
-        this.currentVolume = (double) currentVolume / MAX_VOLUME;
+        this.currentVolume =  currentVolume / MAX_VOLUME;
         return this.currentVolume;
     }
 
     public void jump(double controlPosition){
         try {
-            long skipBytes = Math.round(((Integer)bytesLen)*controlPosition);
+            long skipBytes = Math.round((bytesLen)*controlPosition);
             player.seek(skipBytes);
             player.setGain(currentVolume);
         } catch (BasicPlayerException e) {
